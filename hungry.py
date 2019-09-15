@@ -1,1 +1,1 @@
-print("I am hungry ds gg")
+print("I am hungry")
