@@ -1,7 +1,7 @@
 print("I am hungry are you")
 print("I am hungry are you")
-
+print("a")
 print("I am hungry are you")
-
-
+print("c")
+print("b")
 print("I am hungry are you")
