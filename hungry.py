@@ -1,5 +1,5 @@
-print("I am hungry are you")
-print("I am hungry are you")
+print("1")
+print("3")
 
 
 
