@@ -1,4 +1,3 @@
-
 import requests
 import bs4
 import time
@@ -261,20 +260,20 @@ while True:
 				fd.write("15mins")
 				temp_list_scraper_outp15mins=list_scraper_outp15mins
 				scraperlist15mins()
-				op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
-				notifier.notify("Max OI change 15 min")
-				notifier.notify(op)
-				fd.write(op)
+				if(len(temp_list_scraper_outp15mins) != 0):
+					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
+					notifier.notify(op)
+					fd.write(op)
 			if(minutes_now % 60 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("30mins")
 				temp_list_scraper_outp_hourly=list_scraper_outp_hourly
 				scraperlisthourly()
-				op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-				notifier.notify("Max OI change 60 min")
-				notifier.notify(op)
-				fd.write(op)
+				if (len(temp_list_scraper_outp_hourly) != 0):
+					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
+					notifier.notify(op)
+					fd.write(op)
 	
 	except:
 		continue
