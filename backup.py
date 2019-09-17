@@ -1,8 +1,4 @@
 
-Gaurang <govishwasrao99@gmail.com>
-11:20 AM (2 hours ago)
-to me
-
 import requests
 import bs4
 import time
@@ -21,9 +17,8 @@ list_scraper_outp15mins=[]
 list_scraper_outp_hourly=[]
 namelist=[]
 difflist=[]
-#atm_list=[]
-#atm_itm_list=[]
 
+#List of stocks to scrape the data from
 scraping_list=['https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=238&symbol=SBIN&symbol=sbin&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=242&symbol=RELIANCE&symbol=reliance&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=2212&symbol=TCS&symbol=tcs&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
@@ -56,7 +51,7 @@ aggeregated_list_stock_index=['SBIN','RELIANCE','TCS','HDFC','HDFCBANK','MARUTI'
 'ICICIBANK','AXISBANK','INDUSINDBK','FEDERALBNK','WIPRO','TECHM','HCLTECH','INFY','ITC','VEDL',
 'TATASTEEL','ZEEL','NIFTY','BANKNIFTY']
 
-
+#Scrape the live values of OI every 15mins
 def scraperlist15mins():
 	global list_scraper_outp15mins
 	list_scraper_outp15mins=[]
@@ -68,19 +63,20 @@ def scraperlist15mins():
 			
 			respon=requests.get(scraping_list[i],timeout=10)
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
-			for j in range(o,o+10):
+			for j in range(o,o+18):
 				try:
+					#Make OI list over here make changes here 
 					result = soupe.find_all('a', attrs={'href': re.compile(namelist[j])})
 					
-					#Make OI list over here
+					
 					list_scraper_outp15mins.append(float(str(result[0]).split('target="_blank">')[1].split('<')[0]))
 				except:
 					list_scraper_outp15mins.append('None')
 					continue
 
-			o+=10
+			o+=18
 			break
-			
+#Scrape the live valuses of OI every hour 		
 def scraperlisthourly():
 	global list_scraper_outp_hourly
 	list_scraper_outp_hourly=[]
@@ -92,17 +88,17 @@ def scraperlisthourly():
 			
 			respon=requests.get(scraping_list[i],timeout=10)
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
-			for j in range(o,o+10):
+			for j in range(o,o+18):
 				try:
+					#Make OI list over here make changes here 
 					result = soupe.find_all('a', attrs={'href': re.compile(namelist[j])})
-					
-					#Make OI list over here hourly calculation
+	
 					list_scraper_outp_hourly.append(float(str(result[0]).split('target="_blank">')[1].split('<')[0]))
 				except:
 					list_scraper_outp_hourly.append('None')
 					continue
 
-			o+=10
+			o+=18
 			break
 
 #Calculating all the option pivot levels for stock from the medium
@@ -252,28 +248,31 @@ def comaparator(temp_list,main_list):
 	global difflist
 	difflist=[]
 	for i in range(len(temp_list)):
-		difflist.append(abs((main_list[i]-temp_list[i])/main_list[i]))
+		difflist.append(str(abs((main_list[i]-temp_list[i])/main_list[i]))+namelist[i])
+	return sorted(difflist)
 
 while True:
 	try:
 		with open('open_intrest.txt','a') as fd:
 			minutes_now=datetime.now().minute
 			if(minutes_now % 15 == 0):
+				op=[]
+				fd.write(str(datetime.now()))
+				fd.write("15mins")
 				temp_list_scraper_outp15mins=list_scraper_outp15mins
 				scraperlist15mins()
-				comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
+				op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
+				notifier.notify(op)
+				fd.write(op)
 			if(minutes_now % 60 == 0):
+				op=[]
+				fd.write(str(datetime.now()))
+				fd.write("30mins")
 				temp_list_scraper_outp_hourly=list_scraper_outp_hourly
 				scraperlisthourly()
-				comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-
-
-
-			scraperlist()
-
-			fd.write("\n")
-			fd.write(str(datetime.now()))
-
-
+				op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
+				notifier.notify(op)
+				fd.write(op)
+	
 	except:
 		continue
