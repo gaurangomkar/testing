@@ -62,12 +62,31 @@ def scraperlist15mins():
 			
 			respon=requests.get(scraping_list[i],timeout=10)
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
+			col = soupe.find_all('tr')
 			for j in range(o,o+18):
 				try:
 					#Make OI list over here make changes here 
-					result = soupe.find_all('a', attrs={'href': re.compile(namelist[j])})
 					
-					
+					print(namelist[j])
+		
+					for xo in col:
+						#print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+						#print((str(xo)))
+						#print(namelist[j])
+						#print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+						#result = re.search(namelist[j],str(i))
+						#print(result)
+						time.sleep(5)
+						
+						if str(namelist[j]) in str(xo):
+							abc=str(xo).split(namelist[j])
+							print(abc)
+					#		print(namelist[j])
+							print("oooooooooooo")
+							time.sleep(5)
+						#print(i)
+					#	p#rint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+					#time.sleep(5)
 					list_scraper_outp15mins.append(float(str(result[0]).split('target="_blank">')[1].split('<')[0]))
 				except:
 					list_scraper_outp15mins.append('None')
@@ -247,33 +266,43 @@ def comaparator(temp_list,main_list):
 	global difflist
 	difflist=[]
 	for i in range(len(temp_list)):
-		difflist.append(str(abs((main_list[i]-temp_list[i])/main_list[i]))+namelist[i])
+		if (main_list[i] != 'None') and (temp_list[i] != 'None'):
+			difflist.append(str(abs((main_list[i]-temp_list[i])/main_list[i]))+namelist[i])
 	return sorted(difflist)
 
 while True:
 	try:
 		with open('open_intrest.txt','a') as fd:
 			minutes_now=datetime.now().minute
-			if(minutes_now % 15 == 0):
+			if(True):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("15mins")
+				fd.write("\n")
+				print('hey')
+				print('hey')
 				temp_list_scraper_outp15mins=list_scraper_outp15mins
+				print(temp_list_scraper_outp15mins)
+				print("!!!!!!!!!!!")
 				scraperlist15mins()
 				if(len(temp_list_scraper_outp15mins) != 0):
+					print("hello")
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
-					notifier.notify(op)
-					fd.write(op)
+					print(op)
+				#	notifier.notify(op)
+					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("30mins")
+				fd.write("\n")
 				temp_list_scraper_outp_hourly=list_scraper_outp_hourly
 				scraperlisthourly()
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-					notifier.notify(op)
-					fd.write(op)
+				#	notifier.notify(op)
+					print(op)
+					fd.write(str(op))
 	
 	except:
 		continue
