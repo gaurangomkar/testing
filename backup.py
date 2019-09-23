@@ -59,41 +59,61 @@ def scraperlist15mins():
 	for i in range(len(scraping_list)):
 		
 		while (o < len(namelist)):
+			flag=True
+			while flag:
+				try:
+					respon=requests.get(scraping_list[i],timeout=10)
+				except:
+					continue
+				if (respon.status_code != 200):
+					print("Bad Request")
+					continue
+				if(len(respon.text)  <= 1):
+					print("Size Exception")
+				
+					continue
+				
+				flag=False
 			
-			respon=requests.get(scraping_list[i],timeout=10)
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
 			col = soupe.find_all('tr')
+			#print(len(col))
 			for j in range(o,o+18):
 				try:
 					#Make OI list over here make changes here 
-					
+					#print(j)
 					print(namelist[j])
-		
-					for xo in col:
-						#print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-						#print((str(xo)))
-						#print(namelist[j])
-						#print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-						#result = re.search(namelist[j],str(i))
-						#print(result)
-						time.sleep(5)
+					#time.sleep(6)
+				#	stri="\w+"+namelist[j]+"\w+"
+					for result in col:
+						a=(str(result).split("\n"))
+						for op in range(len(a)):
+							#print(op)
+							#print("@@@@@@@2")
+							if str(namelist[j]) in str(a[op]):
+
+								if namelist[j].endswith("PE"):
+									#print(a[op])
+									list_scraper_outp15mins.append(a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+								else:
+									#print(a[op])
+									list_scraper_outp15mins.append(a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+
+								#time.sleep(6)
+								#print("!!!!!")
 						
-						if str(namelist[j]) in str(xo):
-							abc=str(xo).split(namelist[j])
-							print(abc)
-					#		print(namelist[j])
-							print("oooooooooooo")
-							time.sleep(5)
-						#print(i)
-					#	p#rint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-					#time.sleep(5)
-					list_scraper_outp15mins.append(float(str(result[0]).split('target="_blank">')[1].split('<')[0]))
-				except:
+		
+					
+						
+				except Exception as e:
+					print(e)
 					list_scraper_outp15mins.append('None')
 					continue
 
 			o+=18
 			break
+
+
 #Scrape the live valuses of OI every hour 		
 def scraperlisthourly():
 	global list_scraper_outp_hourly
@@ -103,21 +123,60 @@ def scraperlisthourly():
 	for i in range(len(scraping_list)):
 		
 		while (o < len(namelist)):
+			while flag:
+				try:
+					respon=requests.get(scraping_list[i],timeout=10)
+				except:
+					continue
+				if (respon.status_code != 200):
+					print("Bad Request")
+					continue
+				if(len(respon.text)  <= 1):
+					print("Size Exception")
+				
+					continue
+				
+				flag=False
 			
-			respon=requests.get(scraping_list[i],timeout=10)
+			
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
+			col = soupe.find_all('tr')
+			#print(len(col))
 			for j in range(o,o+18):
 				try:
 					#Make OI list over here make changes here 
-					result = soupe.find_all('a', attrs={'href': re.compile(namelist[j])})
-	
-					list_scraper_outp_hourly.append(float(str(result[0]).split('target="_blank">')[1].split('<')[0]))
-				except:
+					#print(j)
+					print(namelist[j])
+				#	time.sleep(6)
+				#	stri="\w+"+namelist[j]+"\w+"
+					for result in col:
+						a=(str(result).split("\n"))
+						for op in range(len(a)):
+							#print(op)
+							#print("@@@@@@@2")
+							if str(namelist[j]) in str(a[op]):
+
+								if namelist[j].endswith("PE"):
+									#print(a[op])
+									list_scraper_outp_hourly.append(a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+								else:
+									#print(a[op])
+									list_scraper_outp_hourly.append(a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+
+								#time.sleep(6)
+								#print("!!!!!")
+						
+		
+					
+						
+				except Exception as e:
+					print(e)
 					list_scraper_outp_hourly.append('None')
 					continue
 
 			o+=18
 			break
+
 
 #Calculating all the option pivot levels for stock from the medium
 def optionpricefinder(stockname):
@@ -241,8 +300,9 @@ def stringmaker(stocknamelist,index_name_list):
 		print(d)
 		for o in range(len(d)):		
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
-			namelist.append('{}&instrument=OPTSTK&strike={}&type=CE'.format(i,d[o]))
-			namelist.append('{}&instrument=OPTSTK&strike={}&type=PE'.format(i,d[o]))
+			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=CE'.format(i,d[o]))
+			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=PE'.format(i,d[o]))
+			
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 				
 	for i in index_name_list:
@@ -251,8 +311,8 @@ def stringmaker(stocknamelist,index_name_list):
 		print(d)
 		for o in range(len(d)):		
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
-			namelist.append('{}&instrument=OPTIDX&strike={}&type=CE'.format(i,d[o]))
-			namelist.append('{}&instrument=OPTIDX&strike={}&type=PE'.format(i,d[o]))
+			namelist.append('{}&amp;instrument=OPTIDX&amp;strike={}&amp;type=CE'.format(i,d[o]))
+			namelist.append('{}&amp;instrument=OPTIDX&amp;strike={}&amp;type=PE'.format(i,d[o]))
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))					
 		print(namelist)
 		print(stocklist)
@@ -266,15 +326,15 @@ def comaparator(temp_list,main_list):
 	global difflist
 	difflist=[]
 	for i in range(len(temp_list)):
-		if (main_list[i] != 'None') and (temp_list[i] != 'None'):
-			difflist.append(str(abs((main_list[i]-temp_list[i])/main_list[i]))+namelist[i])
+		if ((main_list[i]) != 'None') and ((temp_list[i]) != 'None' and  (main_list[i]) != '-') and ((temp_list[i]) != '-'):
+			difflist.append(str(abs((int(main_list[i])-int(temp_list[i]))/int(main_list[i])))+(namelist[i]))
 	return sorted(difflist)
 
 while True:
 	try:
 		with open('open_intrest.txt','a') as fd:
 			minutes_now=datetime.now().minute
-			if(True):
+			if(minutes_now % 15 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("15mins")
@@ -285,11 +345,14 @@ while True:
 				print(temp_list_scraper_outp15mins)
 				print("!!!!!!!!!!!")
 				scraperlist15mins()
-				if(len(temp_list_scraper_outp15mins) != 0):
+				print(len(temp_list_scraper_outp15mins))
+				time.sleep(5)
+				if(len(temp_list_scraper_outp15mins) > 0):
 					print("hello")
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
 					print(op)
-				#	notifier.notify(op)
+					notifier.notify("15 min ::")
+					notifier.notify(op)
 					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
@@ -300,7 +363,8 @@ while True:
 				scraperlisthourly()
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-				#	notifier.notify(op)
+					notifier.notify("hourly")
+					notifier.notify(op)
 					print(op)
 					fd.write(str(op))
 	
