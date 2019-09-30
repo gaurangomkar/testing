@@ -1,3 +1,4 @@
+
 import requests
 import bs4
 import time
@@ -78,12 +79,12 @@ def scraperlist15mins():
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
 			col = soupe.find_all('tr')
 			#print(len(col))
-			for j in range(o,o+18):
+			for j in range(o,o+14):
 				try:
 					#Make OI list over here make changes here 
 					#print(j)
-					print(namelist[j])
-					#time.sleep(6)
+					#print(namelist[j])
+				#	time.sleep(6)
 				#	stri="\w+"+namelist[j]+"\w+"
 					for result in col:
 						a=(str(result).split("\n"))
@@ -93,25 +94,31 @@ def scraperlist15mins():
 							if str(namelist[j]) in str(a[op]):
 
 								if namelist[j].endswith("PE"):
-									#print(a[op])
-									list_scraper_outp15mins.append(a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+									open_intrest=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									#print(type(open_intrest))
+									if(open_intrest.isdigit()):
+										list_scraper_outp15mins.append(open_intrest)
+									else:
+										list_scraper_outp15mins.append("None")
 								else:
-									#print(a[op])
-									list_scraper_outp15mins.append(a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
-
-								#time.sleep(6)
-								#print("!!!!!")
-						
+									
+									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									#print(open_intrest)
+									if(open_intrest.isdigit()):
+										list_scraper_outp15mins.append(open_intrest)
+									else:
+										list_scraper_outp15mins.append("None")
+	
 		
-					
-						
+										
 				except Exception as e:
 					print(e)
 					list_scraper_outp15mins.append('None')
 					continue
 
-			o+=18
+			o+=14
 			break
+	print(len(list_scraper_outp15mins))
 
 
 #Scrape the live valuses of OI every hour 		
@@ -142,11 +149,11 @@ def scraperlisthourly():
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
 			col = soupe.find_all('tr')
 			#print(len(col))
-			for j in range(o,o+18):
+			for j in range(o,o+14):
 				try:
 					#Make OI list over here make changes here 
 					#print(j)
-					print(namelist[j])
+					#print(namelist[j])
 				#	time.sleep(6)
 				#	stri="\w+"+namelist[j]+"\w+"
 					for result in col:
@@ -157,24 +164,28 @@ def scraperlisthourly():
 							if str(namelist[j]) in str(a[op]):
 
 								if namelist[j].endswith("PE"):
+									open_intrest=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									#print(a[op])
-									list_scraper_outp_hourly.append(a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
+									if(open_intrest.isdigit()):
+										list_scraper_outp_hourly.append(open_intrest)
+									else:
+										list_scraper_outp_hourly.append("None")
 								else:
 									#print(a[op])
-									list_scraper_outp_hourly.append(a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",",""))
-
-								#time.sleep(6)
-								#print("!!!!!")
-						
+									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									if(open_intrest.isdigit()):
+										list_scraper_outp_hourly.append(open_intrest)
+									else:
+										list_scraper_outp_hourly.append("None")
+	
 		
-					
-						
+										
 				except Exception as e:
-					print(e)
+					#print(e)
 					list_scraper_outp_hourly.append('None')
 					continue
 
-			o+=18
+			o+=14
 			break
 
 
@@ -229,8 +240,7 @@ def optionpricefinder(stockname):
 			list2.append(format(u[j-2],'.2f'))
 			list2.append(format(u[j+3],'.2f'))
 			list2.append(format(u[j-3],'.2f'))
-			list2.append(format(u[j+4],'.2f'))
-			list2.append(format(u[j-4],'.2f'))
+		
 	return sorted(list2)
 
 	
@@ -282,8 +292,8 @@ def optionpricefinderindex(stockname):
 			list2.append(format(u[j-2],'.2f'))
 			list2.append(format(u[j+3],'.2f'))
 			list2.append(format(u[j-3],'.2f'))
-			list2.append(format(u[j+4],'.2f'))
-			list2.append(format(u[j-4],'.2f'))
+			
+			
 	return sorted(list2)
 
 	
@@ -316,6 +326,7 @@ def stringmaker(stocknamelist,index_name_list):
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))					
 		print(namelist)
 		print(stocklist)
+		print(len(namelist))
 
 
 stringmaker(stocknamelist,index_name_list)
@@ -328,13 +339,17 @@ def comaparator(temp_list,main_list):
 	for i in range(len(temp_list)):
 		if ((main_list[i]) != 'None') and ((temp_list[i]) != 'None' and  (main_list[i]) != '-') and ((temp_list[i]) != '-'):
 			difflist.append(str(abs((int(main_list[i])-int(temp_list[i]))/int(main_list[i])))+(namelist[i]))
+		else:
+			difflist.append(0.0)
+			
+
 	return sorted(difflist)
 
 while True:
 	try:
 		with open('open_intrest.txt','a') as fd:
 			minutes_now=datetime.now().minute
-			if(minutes_now % 15 == 0):
+			if(True):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("15mins")
@@ -351,8 +366,8 @@ while True:
 					print("hello")
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
 					print(op)
-					notifier.notify("15 min ::")
-					notifier.notify(op)
+					#notifier.notify("15 min ::")
+					#notifier.notify(op)
 					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
@@ -363,10 +378,11 @@ while True:
 				scraperlisthourly()
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-					notifier.notify("hourly")
-					notifier.notify(op)
+					#notifier.notify("hourly")
+					#notifier.notify(op)
 					print(op)
 					fd.write(str(op))
 	
 	except:
 		continue
+
