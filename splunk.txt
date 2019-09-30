@@ -1,0 +1,123 @@
+rex:
+
+index="main" | rex field=_raw "From:\s+<(?<from>.*)>\s+To:\s+<(?<to>.*)>\s+"
+
+| makeresults | eval text = "user_id=bob;search;my_saved_search" | rex field=text "user_id={1}(?<user>\w+);(?<app_name>\w+);(?<saved_search_name>\w+)"
+
+| makeresults | eval credit_card_number = "1234-5678-9101-1213" | rex field=credit_card_number max_match=0   "(?<digits>\d{4})"
+
+| makeresults | eval credit_card_number = "1234-5678-9101-1213" | rex field=credit_card_number offset_field="new_field" max_match=0  "(?<digits>\d{4})"
+
+"s/<regex>/<replacement>/<flags>"  -- replacement
+"y/<string1>/<string2>/" -- sustitute
+
+| makeresults | eval credit_card_number = "1234-5678-9101-1213" | rex field=credit_card_number mode=sed "s/(\d{4}-){3}/XXXX-XXXX-XXXX-/g"
+
+| makeresults | eval credit_card_number = "1234-5678-9101-1213" | rex field=credit_card_number mode=sed "s/(\d{4})/XXXX/4"
+
+| makeresults | eval credit_card_number = "1234-5678-9101-1213" | rex field=credit_card_number mode=sed "y/1234/XXXX/"
+
+
+regex:
+
+index=main | regex _raw = "From:\s+<[[:alnum:]]+@[[:alnum:]]+\.[[:alpha:]]+>"
+
+erex:
+
+index=main| erex emails examples="MariaDubois@example.com,Exit_Desk@sample.net,lyra@buttercupgames.com"
+
+index=main| erex fromfield=_raw emails  examples="MariaDubois@example.com,Exit_Desk@sample.net,lyra@buttercupgames.com"
+
+index=main| erex fromfield=_raw emails maxtrainers=5  examples="MariaDubois@example.com,Exit_Desk@sample.net,lyra@buttercupgames.com"
+
+| makeresults
+| eval month_text =  "07/02,11/03,13/3,01/03,99/3"
+| erex  months examples="07/02,01/03" counterexamples="99/3" fromfield=month_text
+
+
+
+Mon Mar 19 20:16:27 2018 Info: Bounced: DCID 8413617 MID 19338947 From: <MariaDubois@example.com> To: <zecora@buttercupgames.com> RID 0 - 5.4.7 - Delivery expired (message too old) ('000', ['timeout']) 
+
+Mon Mar 19 20:16:03 2018 Info: Delayed: DCID 8414309 MID 19410908 From: <WeiZhang@example.com> To: <mcintosh@buttercupgames.com> RID 0 - 4.3.2 - Not accepting messages at this time ('421', ['4.3.2 try again later']) 
+
+Mon Mar 19 20:16:02 2018 Info: Bounced: DCID 0 MID 19408690 From: <Exit_Desk@sample.net> To: <lyra@buttercupgames.com> RID 0 - 5.1.2 - Bad destination host ('000', ['DNS Hard Error looking up mahidnrasatyambsg.com (MX):  NXDomain']) 
+
+Mon Mar 19 20:15:53 2018 Info: Delayed: DCID 8414166 MID 19410657 From: <Manish_Das@example.com> To: <dash@buttercupgames.com> RID 0 - 4.3.2 - Not accepting messages at this time ('421', ['4.3.2 try again later']) 
+© 2019 GitHub, Inc.
+
+
+index="main" | eval full_name = 'first name'." ".'last name' | table "first name", "last name", full_name
+
+index="main" | eval "first name" = "Sid" | table "first name" , "last name"
+
+index="main" | eval new_name = 'first name'."New" | table "first name" , new_name
+
+index="main" | eval new_name = case('first name'="First_9","First_900",1=1,'first name') | table "first name",new_name
+
+index=main | eval new_field = validate('first name' = "First_9","Validation Passed") | table "first name", "last name", occupation, salary, new_field
+
+index="main" | eval new_name = if('first name'="First_9","First_900",'first name') | table "first name",new_name
+
+index="main" | eval new_name = if('first name'="First_9","First_900",if('first name'="First_8","First_800",'first name')) | table "first name",new_name
+
+index="main" | eval new_field = "New" , new_field2 = if(new_field = "New","New1","error") |  table "first name", "last name", occupation, salary, new_field, new_field2
+
+index="main" | eval new_field = null() , new_field2 = "Sid" , new_field3 = null() , coalesce_val = coalesce(new_field,new_field2,new_field3)  |  table "first name", "last name", occupation, salary, new_field, new_field2, coalesce_val
+
+index="main" | eval new_field = if('first name' in ("First_7","First_2","First_1"),"true","false") |  table "first name", "last name", occupation, salary, new_field
+
+index="main" | eval new_field = if(like('first name',"%_8%"),"true","false") |  table "first name", "last name", occupation, salary, new_field
+
+index=main | eval new_field = if(match('first name',".+_8"),"true","false") |  table "first name", "last name", occupation, salary, new_field
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+index=main | eval new_field = "3" | eval new_field_num = tonumber(new_field) | eval sum = new_field_num + 2 | table new_field,new_field_num,sum
+
+index=main | eval new_field = 123456789 | eval new_field_num = tostring(new_field,"commas") | eval sum = new_field_num + 2 | table new_field,new_field_num,sum
+
+index=main | eval new_field = 123456789 | eval new_field_num = tostring(new_field = 123456789) | eval sum = new_field_num + 2 | table new_field,new_field_num,sum
+
+index=main | eval new_field = 123456789 | eval new_field_num = tostring(2,"hex") | eval sum = new_field_num + 2 | table new_field,new_field_num,sum
+
+index=main | eval new_field = 123456789 | eval new_field_num = tostring(86400,"duration") | eval sum = new_field_num + 2 | table new_field,new_field_num,sum
+
+------------------------------------------------------------------------------------------------------------------------------
+
+index=main | eval new_field = sha1("1234-5678-9101-1121")
+
+------------------------------------------------------------------------------------------------------------------------------
+
+index=main | eval new_field = now()
+
+index=main | eval new_field = now() | eval current_time = strftime(new_field,"%d-%m-%Y %H:%M:%S") | eval current_time_epoc = strptime(current_time,"%d-%m-%Y %H:%M:%S") | table new_field,current_time,current_time_epoc
+
+
+index=main | eval new_field = time() | table "first name", "last name", occupation, salary, new_field
+
+------------------------------------------------------------------------------------------------------------------------------
+
+index=main | eval new_field = null() | eval test = tostring(isnull(new_field))
+
+index=main | eval new_field = typeof(12)
+
+----------------------------------------------------------------------------------------------
+
+
+index=main | eval new_field = max(500,salary)
+
+index=main | eval new_field = random()
+
+-----------------------------------------------------------------------------------------------------
+
+index=main | eval new_field = "Sid" , length = len(new_field)
+
+index=main | eval new_field = replace('first name',"_\d{1}","00") | table "first name", "last name", occupation, salary, new_field
+
+index=main | eval new_field = substr("string", 1, 3)
+
+index=main | eval new_field = urldecode("http%3A%2F%2Fwww.splunk.com%2Fdownload%3Fr%3Dheader")
+
+------------------------------------------------------------------------------------------------------------
+
+index=main | table "first name", "last name", occupation, salary| stats count(eval(occupation="Occu_9" AND salary=1000)) as 9_count
