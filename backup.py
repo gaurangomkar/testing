@@ -38,8 +38,8 @@ scraping_list=['https://www.nseindia.com/live_market/dynaContent/live_watch/opti
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=237&symbol=VEDL&symbol=VEDL&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=234&symbol=TATASTEEL&symbol=tatasteel&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=1105&symbol=ZEEL&symbol=zee&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=26SEP2019',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=26SEP2019'
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=31OCT2019',
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=31OCT2019'
 ]
 #Stocks currently being monitored
 stocknamelist=['SBIN','RELIANCE','TCS','HDFC','HDFCBANK','MARUTI','BAJAJFINSV',
@@ -81,16 +81,11 @@ def scraperlist15mins():
 			#print(len(col))
 			for j in range(o,o+14):
 				try:
-					#Make OI list over here make changes here 
-					#print(j)
-					#print(namelist[j])
-				#	time.sleep(6)
-				#	stri="\w+"+namelist[j]+"\w+"
+					lflag=True
 					for result in col:
 						a=(str(result).split("\n"))
 						for op in range(len(a)):
-							#print(op)
-							#print("@@@@@@@2")
+							
 							if str(namelist[j]) in str(a[op]):
 
 								if namelist[j].endswith("PE"):
@@ -98,17 +93,25 @@ def scraperlist15mins():
 									#print(type(open_intrest))
 									if(open_intrest.isdigit()):
 										list_scraper_outp15mins.append(open_intrest)
+										lflag=False
 									else:
 										list_scraper_outp15mins.append("None")
+										lflag=False
 								else:
 									
 									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									#print(open_intrest)
 									if(open_intrest.isdigit()):
+										lflag=False
 										list_scraper_outp15mins.append(open_intrest)
 									else:
 										list_scraper_outp15mins.append("None")
-	
+										lflag=False
+					else:
+						if(lflag==True):
+
+							list_scraper_outp15mins.append("None")
+
 		
 										
 				except Exception as e:
@@ -151,38 +154,42 @@ def scraperlisthourly():
 			#print(len(col))
 			for j in range(o,o+14):
 				try:
-					#Make OI list over here make changes here 
-					#print(j)
-					#print(namelist[j])
-				#	time.sleep(6)
-				#	stri="\w+"+namelist[j]+"\w+"
+					lflag=True
 					for result in col:
 						a=(str(result).split("\n"))
 						for op in range(len(a)):
-							#print(op)
-							#print("@@@@@@@2")
+							
 							if str(namelist[j]) in str(a[op]):
 
 								if namelist[j].endswith("PE"):
 									open_intrest=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
-									#print(a[op])
+									#print(type(open_intrest))
 									if(open_intrest.isdigit()):
 										list_scraper_outp_hourly.append(open_intrest)
+										lflag=False
 									else:
 										list_scraper_outp_hourly.append("None")
+										lflag=False
 								else:
-									#print(a[op])
+									
 									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									#print(open_intrest)
 									if(open_intrest.isdigit()):
+										lflag=False
 										list_scraper_outp_hourly.append(open_intrest)
 									else:
 										list_scraper_outp_hourly.append("None")
-	
+										lflag=False
+					else:
+						if(lflag==True):
+
+							list_scraper_outp_hourly.append("None")
+
 		
 										
 				except Exception as e:
-					#print(e)
-					list_scraper_outp_hourly.append('None')
+					print(e)
+					list_scraper_outp15mins.append('None')
 					continue
 
 			o+=14
@@ -338,7 +345,7 @@ def comaparator(temp_list,main_list):
 	difflist=[]
 	for i in range(len(temp_list)):
 		if ((main_list[i]) != 'None') and ((temp_list[i]) != 'None' and  (main_list[i]) != '-') and ((temp_list[i]) != '-'):
-			difflist.append(str(abs((int(main_list[i])-int(temp_list[i]))/int(main_list[i])))+(namelist[i]))
+			difflist.append(str(abs((float(main_list[i])-float(temp_list[i]))/float(main_list[i])))+(namelist[i]))
 		else:
 			difflist.append(0.0)
 			
@@ -349,7 +356,7 @@ while True:
 	try:
 		with open('open_intrest.txt','a') as fd:
 			minutes_now=datetime.now().minute
-			if(True):
+			if(minutes_now % 15 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
 				fd.write("15mins")
@@ -366,22 +373,24 @@ while True:
 					print("hello")
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
 					print(op)
-					#notifier.notify("15 min ::")
-					#notifier.notify(op)
+					notifier.notify("15 min ::")
+					notifier.notify(op)
 					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
-				fd.write("30mins")
+				fd.write("15mins")
 				fd.write("\n")
 				temp_list_scraper_outp_hourly=list_scraper_outp_hourly
 				scraperlisthourly()
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
-					#notifier.notify("hourly")
-					#notifier.notify(op)
+					notifier.notify("hourly")
+					notifier.notify(op)
 					print(op)
 					fd.write(str(op))
+			#notifier.notify("sleeping 45 sec")
+			time.sleep(45)
 	
 	except:
 		continue
