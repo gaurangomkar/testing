@@ -1,4 +1,3 @@
-
 import requests
 import bs4
 import time
@@ -38,8 +37,8 @@ scraping_list=['https://www.nseindia.com/live_market/dynaContent/live_watch/opti
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=237&symbol=VEDL&symbol=VEDL&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=234&symbol=TATASTEEL&symbol=tatasteel&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=1105&symbol=ZEEL&symbol=zee&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=31OCT2019',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=31OCT2019'
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=26SEP2019',
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=26SEP2019'
 ]
 #Stocks currently being monitored
 stocknamelist=['SBIN','RELIANCE','TCS','HDFC','HDFCBANK','MARUTI','BAJAJFINSV',
@@ -54,11 +53,9 @@ aggeregated_list_stock_index=['SBIN','RELIANCE','TCS','HDFC','HDFCBANK','MARUTI'
 #Scrape the live values of OI every 15mins
 def scraperlist15mins():
 	global list_scraper_outp15mins
-	list_scraper_outp15mins=[]
-	
+	list_scraper_outp15mins=[]	
 	o=0
-	for i in range(len(scraping_list)):
-		
+	for i in range(len(scraping_list)):		
 		while (o < len(namelist)):
 			flag=True
 			while flag:
@@ -70,50 +67,33 @@ def scraperlist15mins():
 					print("Bad Request")
 					continue
 				if(len(respon.text)  <= 1):
-					print("Size Exception")
-				
-					continue
-				
+					print("Size Exception")	
+					continue				
 				flag=False
 			
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
 			col = soupe.find_all('tr')
-			#print(len(col))
 			for j in range(o,o+14):
-				try:
-					lflag=True
+				try:					
+					print(namelist[j])
 					for result in col:
 						a=(str(result).split("\n"))
-						for op in range(len(a)):
-							
-							if str(namelist[j]) in str(a[op]):
-
+						for op in range(len(a))
+							if str(namelist[j]) in str(a[op]):							
 								if namelist[j].endswith("PE"):
-									open_intrest=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
-									#print(type(open_intrest))
-									if(open_intrest.isdigit()):
-										list_scraper_outp15mins.append(open_intrest)
-										lflag=False
+									open_intrest_pe=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									if(open_intrest_pe.isnumeric()):
+										list_scraper_outp15mins.append(open_intrest_pe)				
 									else:
 										list_scraper_outp15mins.append("None")
-										lflag=False
 								else:
-									
-									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
-									#print(open_intrest)
-									if(open_intrest.isdigit()):
-										lflag=False
-										list_scraper_outp15mins.append(open_intrest)
+									open_intrest_ce=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									if(open_intrest_ce.isnumeric()):
+										list_scraper_outp15mins.append(open_intrest_ce)										
 									else:
 										list_scraper_outp15mins.append("None")
-										lflag=False
-					else:
-						if(lflag==True):
-
-							list_scraper_outp15mins.append("None")
-
-		
 										
+																									
 				except Exception as e:
 					print(e)
 					list_scraper_outp15mins.append('None')
@@ -121,17 +101,14 @@ def scraperlist15mins():
 
 			o+=14
 			break
-	print(len(list_scraper_outp15mins))
 
 
 #Scrape the live valuses of OI every hour 		
 def scraperlisthourly():
 	global list_scraper_outp_hourly
 	list_scraper_outp_hourly=[]
-	
 	o=0
-	for i in range(len(scraping_list)):
-		
+	for i in range(len(scraping_list)):	
 		while (o < len(namelist)):
 			while flag:
 				try:
@@ -143,53 +120,34 @@ def scraperlisthourly():
 					continue
 				if(len(respon.text)  <= 1):
 					print("Size Exception")
-				
-					continue
-				
+					continue				
 				flag=False
-			
-			
+						
 			soupe=bs4.BeautifulSoup(respon.text,'lxml')
 			col = soupe.find_all('tr')
 			#print(len(col))
 			for j in range(o,o+14):
-				try:
-					lflag=True
+				try:					
+					print(namelist[j])
 					for result in col:
 						a=(str(result).split("\n"))
-						for op in range(len(a)):
-							
-							if str(namelist[j]) in str(a[op]):
-
+						for op in range(len(a))
+							if str(namelist[j]) in str(a[op]):							
 								if namelist[j].endswith("PE"):
-									open_intrest=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
-									#print(type(open_intrest))
-									if(open_intrest.isdigit()):
-										list_scraper_outp_hourly.append(open_intrest)
-										lflag=False
-									else:
-										list_scraper_outp_hourly.append("None")
-										lflag=False
+									open_intrest_pe=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									if(open_intrest_pe.isnumeric()):
+										list_scraper_outp_hourly.append(open_intrest_pe)								
+									else:										
+										list_scraper_outp_hourly.append("None")			
 								else:
-									
-									open_intrest=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
-									#print(open_intrest)
-									if(open_intrest.isdigit()):
-										lflag=False
-										list_scraper_outp_hourly.append(open_intrest)
-									else:
-										list_scraper_outp_hourly.append("None")
-										lflag=False
-					else:
-						if(lflag==True):
-
-							list_scraper_outp_hourly.append("None")
-
-		
-										
+									open_intrest_ce=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
+									if(open_intrest_ce.isnumeric()):										
+										list_scraper_outp_hourly.append(open_intrest_ce)										
+									else:										
+										list_scraper_outp_hourly.append("None")																																			
 				except Exception as e:
 					print(e)
-					list_scraper_outp15mins.append('None')
+					list_scraper_outp_hourly.append('None')
 					continue
 
 			o+=14
@@ -218,8 +176,7 @@ def optionpricefinder(stockname):
 			print("Bad Request")
 		if(len(respon.text)  <= 1):
 			print("Size Exception")				
-			continue
-				
+			continue			
 		flag=False
 
 	soupe=bs4.BeautifulSoup(respon.text,'lxml')
@@ -231,7 +188,6 @@ def optionpricefinder(stockname):
 		a=str((result[i])).split(",")[3].strip(" '")
 		(list1.append(float(a)))
 	u=(sorted(list(set(list1))))
-	
 	
 	for i in u:
 		list3.append((((i-curent_price))))
@@ -247,27 +203,21 @@ def optionpricefinder(stockname):
 			list2.append(format(u[j-2],'.2f'))
 			list2.append(format(u[j+3],'.2f'))
 			list2.append(format(u[j-3],'.2f'))
-		
 	return sorted(list2)
-
 	
 #Calculation for option pivots levels for index same as above
 def optionpricefinderindex(stockname):
 	list1=[]
 	list2=[]
 	list3=[]
-	#global atm_list
-	#global atm_itm_list
 	stocklist='https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=238&symbol={}&symbol={}&instrument=OPTIDX&date=-&segmentLink=17&segmentLink=17'.format(stockname,stockname)
 	
-
 	flag=True
 	while flag:
 		try:
 			respon=requests.get(stocklist,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'},timeout=20)
 		except:
-			continue
-		
+			continue	
 		if (respon.status_code != 200):
 			print("Bad Request")
 			continue
@@ -299,10 +249,7 @@ def optionpricefinderindex(stockname):
 			list2.append(format(u[j-2],'.2f'))
 			list2.append(format(u[j+3],'.2f'))
 			list2.append(format(u[j-3],'.2f'))
-			
-			
 	return sorted(list2)
-
 	
 #optionpricefinder("WIPRO")
 #Making all the string to hit in order to fetch all the data
@@ -310,8 +257,7 @@ def stringmaker(stocknamelist,index_name_list):
 	global stocklist
 	global namelist
 	stocklist=[]
-	namelist=[]
-	
+	namelist=[]	
 	for i in stocknamelist:		
 		d=optionpricefinder(i)				
 		print(d)
@@ -319,7 +265,6 @@ def stringmaker(stocknamelist,index_name_list):
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=CE'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=PE'.format(i,d[o]))
-			
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 				
 	for i in index_name_list:
@@ -333,23 +278,19 @@ def stringmaker(stocknamelist,index_name_list):
 			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))					
 		print(namelist)
 		print(stocklist)
-		print(len(namelist))
-
 
 stringmaker(stocknamelist,index_name_list)
 
 #Initilizing the notifier class
-notifier = SlackNotifier("https://hooks.slack.com/services/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")
+notifier = SlackNotifier("https://hooks.slack.com/services/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")
+
+#Comapares the activity in last 15min and hour
 def comaparator(temp_list,main_list):
 	global difflist
 	difflist=[]
 	for i in range(len(temp_list)):
-		if ((main_list[i]) != 'None') and ((temp_list[i]) != 'None' and  (main_list[i]) != '-') and ((temp_list[i]) != '-'):
-			difflist.append(str(abs((float(main_list[i])-float(temp_list[i]))/float(main_list[i])))+(namelist[i]))
-		else:
-			difflist.append(0.0)
-			
-
+		if ((main_list[i]) != 'None') and ((temp_list[i]) != 'None'):
+			difflist.append(str(abs((int(main_list[i])-int(temp_list[i]))/int(main_list[i])))+(namelist[i]))
 	return sorted(difflist)
 
 while True:
@@ -361,8 +302,6 @@ while True:
 				fd.write(str(datetime.now()))
 				fd.write("15mins")
 				fd.write("\n")
-				print('hey')
-				print('hey')
 				temp_list_scraper_outp15mins=list_scraper_outp15mins
 				print(temp_list_scraper_outp15mins)
 				print("!!!!!!!!!!!")
@@ -370,28 +309,23 @@ while True:
 				print(len(temp_list_scraper_outp15mins))
 				time.sleep(5)
 				if(len(temp_list_scraper_outp15mins) > 0):
-					print("hello")
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
-					print(op)
 					notifier.notify("15 min ::")
-					notifier.notify(op)
+					notifier.notify(str(op))
 					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
 				fd.write(str(datetime.now()))
-				fd.write("15mins")
+				fd.write("60mins")
 				fd.write("\n")
 				temp_list_scraper_outp_hourly=list_scraper_outp_hourly
 				scraperlisthourly()
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
 					notifier.notify("hourly")
-					notifier.notify(op)
+					notifier.notify(str(op))
 					print(op)
 					fd.write(str(op))
-			#notifier.notify("sleeping 45 sec")
-			time.sleep(45)
 	
 	except:
 		continue
-
