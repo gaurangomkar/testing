@@ -37,8 +37,8 @@ scraping_list=['https://www.nseindia.com/live_market/dynaContent/live_watch/opti
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=237&symbol=VEDL&symbol=VEDL&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=234&symbol=TATASTEEL&symbol=tatasteel&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
 'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=1105&symbol=ZEEL&symbol=zee&instrument=OPTSTK&date=-&segmentLink=17&segmentLink=17',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=26SEP2019',
-'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=26SEP2019'
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=NIFTY&date=31OCT2019',
+'https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?segmentLink=17&instrument=OPTIDX&symbol=BANKNIFTY&date=31OCT2019'
 ]
 #Stocks currently being monitored
 stocknamelist=['SBIN','RELIANCE','TCS','HDFC','HDFCBANK','MARUTI','BAJAJFINSV',
@@ -77,21 +77,31 @@ def scraperlist15mins():
 				try:					
 					print(namelist[j])
 					for result in col:
+						flag=False
 						a=(str(result).split("\n"))
-						for op in range(len(a))
+						for op in range(len(a)):
 							if str(namelist[j]) in str(a[op]):							
 								if namelist[j].endswith("PE"):
 									open_intrest_pe=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									if(open_intrest_pe.isnumeric()):
-										list_scraper_outp15mins.append(open_intrest_pe)				
+										list_scraper_outp15mins.append(open_intrest_pe)
+										flag=True				
 									else:
 										list_scraper_outp15mins.append("None")
+										flag=True
 								else:
 									open_intrest_ce=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									if(open_intrest_ce.isnumeric()):
-										list_scraper_outp15mins.append(open_intrest_ce)										
+										list_scraper_outp15mins.append(open_intrest_ce)
+										flag=True									
 									else:
 										list_scraper_outp15mins.append("None")
+										flag=True
+					else:
+						if(flag==False):
+							list_scraper_outp15mins.append("None")
+
+
 										
 																									
 				except Exception as e:
@@ -130,21 +140,31 @@ def scraperlisthourly():
 				try:					
 					print(namelist[j])
 					for result in col:
+						flag=False
 						a=(str(result).split("\n"))
-						for op in range(len(a))
+						for op in range(len(a)):
 							if str(namelist[j]) in str(a[op]):							
 								if namelist[j].endswith("PE"):
 									open_intrest_pe=a[op+7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									if(open_intrest_pe.isnumeric()):
-										list_scraper_outp_hourly.append(open_intrest_pe)								
+										list_scraper_outp_hourly.append(open_intrest_pe)
+										flag=True							
 									else:										
-										list_scraper_outp_hourly.append("None")			
+										list_scraper_outp_hourly.append("None")
+										flag=True	
 								else:
 									open_intrest_ce=a[op-7].split(">")[1].split("<")[0].strip(" ").replace(",","")
 									if(open_intrest_ce.isnumeric()):										
-										list_scraper_outp_hourly.append(open_intrest_ce)										
+										list_scraper_outp_hourly.append(open_intrest_ce)
+										flag=True										
 									else:										
-										list_scraper_outp_hourly.append("None")																																			
+										list_scraper_outp_hourly.append("None")
+										flag=True
+
+						else:
+							if(flag==False):
+								list_scraper_outp_hourly.append("None")
+
 				except Exception as e:
 					print(e)
 					list_scraper_outp_hourly.append('None')
@@ -210,7 +230,7 @@ def optionpricefinderindex(stockname):
 	list1=[]
 	list2=[]
 	list3=[]
-	stocklist='https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=238&symbol={}&symbol={}&instrument=OPTIDX&date=-&segmentLink=17&segmentLink=17'.format(stockname,stockname)
+	stocklist='https://www.nseindia.com/live_market/dynaContent/live_watch/option_chain/optionKeys.jsp?symbolCode=238&symbol={}&symbol={}&instrument=OPTIDX&date=31OCT2019&segmentLink=17&segmentLink=17'.format(stockname,stockname)
 	
 	flag=True
 	while flag:
@@ -262,27 +282,27 @@ def stringmaker(stocknamelist,index_name_list):
 		d=optionpricefinder(i)				
 		print(d)
 		for o in range(len(d)):		
-			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
+			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=31OCT2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=CE'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTSTK&amp;strike={}&amp;type=PE'.format(i,d[o]))
-			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
+			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTSTK&expiry=31OCT2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 				
 	for i in index_name_list:
 		print(i)	
 		d=optionpricefinderindex(i)			
 		print(d)
 		for o in range(len(d)):		
-			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
+			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=31OCT2019&type=CE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTIDX&amp;strike={}&amp;type=CE'.format(i,d[o]))
 			namelist.append('{}&amp;instrument=OPTIDX&amp;strike={}&amp;type=PE'.format(i,d[o]))
-			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=26SEP2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))					
+			stocklist.append('https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/getFOHistoricalData.jsp?underlying={}&instrument=OPTIDX&expiry=31OCT2019&type=PE&strike={}&fromDate=undefined&toDate=undefined&datePeriod=3months'.format(i,d[o]))					
 		print(namelist)
 		print(stocklist)
 
 stringmaker(stocknamelist,index_name_list)
 
 #Initilizing the notifier class
-notifier = SlackNotifier("https://hooks.slack.com/services/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")
+notifier = SlackNotifier("https://hooks.slack.com/services/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")
 
 #Comapares the activity in last 15min and hour
 def comaparator(temp_list,main_list):
@@ -311,7 +331,7 @@ while True:
 				if(len(temp_list_scraper_outp15mins) > 0):
 					op=comaparator(temp_list_scraper_outp15mins,list_scraper_outp15mins)
 					notifier.notify("15 min ::")
-					notifier.notify(str(op))
+					notifier.notify(str(op[-20:]))
 					fd.write(str(op))
 			if(minutes_now % 60 == 0):
 				op=[]
@@ -323,9 +343,10 @@ while True:
 				if (len(temp_list_scraper_outp_hourly) != 0):
 					op=comaparator(temp_list_scraper_outp_hourly,list_scraper_outp_hourly)
 					notifier.notify("hourly")
-					notifier.notify(str(op))
+					notifier.notify(str(op[-20:]))
 					print(op)
 					fd.write(str(op))
+			time.sleep(50)
 	
 	except:
 		continue
